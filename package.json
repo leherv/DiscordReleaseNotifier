@@ -1,0 +1,32 @@
+{
+  "name": "rolebot",
+  "version": "1.0.0",
+  "description": "automatically assign/unassign roles",
+  "main": "dist/index.js",
+  "scripts": {
+    "start:build": "npm run build && npm run start",
+    "start": "node dist/index.js",
+    "build": "tsc -p ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/leherv/roleBot.git"
+  },
+  "keywords": [
+    "bot",
+    "discord",
+    "roles"
+  ],
+  "author": "Viktor Leher",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/leherv/roleBot/issues"
+  },
+  "homepage": "https://github.com/leherv/roleBot#readme",
+  "devDependencies": {
+    "@types/node": "^13.7.1"
+  },
+  "dependencies": {
+    "discord.js": "11.4.2"
+  }
+}
