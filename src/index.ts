@@ -3,7 +3,7 @@ import token from "./token";
 
 const bot = new Client();
 
-bot.on('ready', _ => {
+bot.on('ready', (_: any) => {
     console.log('Bot ready');
 });
 
@@ -26,6 +26,6 @@ bot.on('message', async msg => {
             break;
         }
     }
-})
+});
 
 bot.login(token);
