@@ -1,31 +1,29 @@
-import { Client } from 'discord.js';
-import token from "./token";
+import { Client, Message } from 'discord.js';
+import config from './config';
+import commands from './commands/commands';
+import { notifyRelease } from './rolebot';
 
 const bot = new Client();
 
-bot.on('ready', (_: any) => {
+bot.once('ready', (_: any) => {
     console.log('Bot ready');
+    // notifyRelease(bot);
 });
 
-bot.on('message', async msg => {
-    switch (msg.content) {
-        case 'sungjinwoo': {
-            msg.reply('<3');
-            break;
-        }
-        case 'chahaein': {
-            msg.reply('waifu');
-            break;
-        }
-        case 'baek': {
-            msg.reply('tigerdude');
-            break;
-        }
-        case 'viktor': {
-            msg.reply('my godfather');
-            break;
+
+bot.on('message', (msg: Message) => {
+    const prefix = config.prefix;
+
+    if (!msg.content.startsWith(prefix) || msg.author.bot) return; // ignore all others
+
+    const args = msg.content.slice(prefix.length).split(/ +/);
+    const commandName = args.shift()?.toLowerCase();
+
+    if (commandName) {
+        if (commands.has(commandName)) {
+            commands.get(commandName)?.command(msg, args);
         }
     }
 });
 
-bot.login(token);
+bot.login(config.token);
