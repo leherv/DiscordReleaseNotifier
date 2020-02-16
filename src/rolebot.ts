@@ -1,25 +1,37 @@
 import { Guild, Role, GuildChannel, GuildMember, TextChannel, Client } from "discord.js";
 import RoleColors from "./role-colors";
+import Release from "./releases/release";
 
-// function getAllGuilds(client: Client): Guild[] {
-//     return client.guilds.array();
-// }
+function notifyRelease(client: Client, message: string): void {
+    client.guilds.array().forEach(g => {
+        let c = g.channels.find(c => c.name === 'chapter_not_read');
+        if (c.type === 'text') {
+            (c as TextChannel).send(message);
+        }
+    });
+}
 
-// function notifyRelease(client: Client): void {
-//     client.guilds.array().forEach(g => {
-//         const date = new Date();
+async function setupReleaseNotifier(client: Client, release: Release) {
+    setInterval(async () => {
+        let date = new Date();
+        console.log(date.getDay());
+        console.log(date.getHours());
+        console.log(date.getMinutes());
+        if (
+            release.day === date.getDay() &&
+            release.hour === date.getHours() &&
+            release.minutes === date.getMinutes()
+        ) {
+            await setupAllGuildsOfBot(client);
+            notifyRelease(client, release.message);
+        }
+    }, release.checkIntervalSeconds * 1000)
 
-//         if (date.getDay() === 3)
+}
 
-//             if (date.getDay() === 0) {
-//                 let c = g.channels.find(c => c.name === 'chapter_not_read');
-//                 if (c.type === 'text') {
-//                     (c as TextChannel).send('NEW CHAPTER!!!!');
-//                 }
-//             }
-//     });
-// }
-
+async function setupAllGuildsOfBot(client: Client) {
+    client.guilds.array().forEach(setupGuild);
+}
 
 async function setupGuild(g: Guild): Promise<void> {
     let chapterReadRole = await getOrCreateRole(g, 'chapter_read', RoleColors.DARK_PURPLE, true);
@@ -76,4 +88,4 @@ async function setNotRead(g: Guild, m: GuildMember) {
     manageRoles(m, [chapterNotReadRole], [chapterReadRole]);
 }
 
-export { setupGuild, setRead, setNotRead };
+export { setupGuild, setupReleaseNotifier, setRead, setNotRead };

@@ -1,13 +1,14 @@
 import { Client, Message } from 'discord.js';
 import config from './config';
 import commands from './commands/commands';
-import { notifyRelease } from './rolebot';
+import { setupReleaseNotifier } from './rolebot';
+import Releases from './releases/releases';
 
 const bot = new Client();
 
 bot.once('ready', (_: any) => {
     console.log('Bot ready');
-    // notifyRelease(bot);
+    Releases.forEach(r => setupReleaseNotifier(bot, r));
 });
 
 
