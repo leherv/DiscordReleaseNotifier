@@ -14,12 +14,9 @@ function notifyRelease(client: Client, message: string): void {
 async function setupReleaseNotifier(client: Client, release: Release) {
     setInterval(async () => {
         let date = new Date();
-        console.log(date.getDay());
-        console.log(date.getHours());
-        console.log(date.getMinutes());
         if (
             release.day === date.getDay() &&
-            release.hour === date.getHours() &&
+            release.hour === date.getHours() + 1 &&
             release.minutes === date.getMinutes()
         ) {
             await setupAllGuildsOfBot(client);

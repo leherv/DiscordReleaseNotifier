@@ -4,7 +4,7 @@
   "description": "automatically assign/unassign roles",
   "main": "dist/index.js",
   "scripts": {
-    "start:build": "npm run build && npm run start",
+    "build:start": "npm run build && npm run start",
     "start": "node dist/index.js",
     "build": "tsc"
   },
