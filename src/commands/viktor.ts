@@ -5,7 +5,7 @@ const command: Command = {
     name: 'viktor',
     description: '',
     command: (msg: Message, _args: string[]) => {
-        msg.channel.send('Praise my godfather Viktor!');
+        msg.channel.send('Praise my homolord Viktor!');
     }
 }
 
