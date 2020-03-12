@@ -1,6 +1,7 @@
-import { Guild, Role, GuildChannel, GuildMember, TextChannel, Client } from "discord.js";
+import { Guild, Role, GuildChannel, GuildMember, TextChannel, Client, CategoryChannel } from "discord.js";
 import RoleColors from "./role-colors";
 import Release from "./releases/release";
+import ChannelTypes from "./channelTypes";
 
 function notifyRelease(client: Client, message: string): void {
     client.guilds.array().forEach(g => {
@@ -11,7 +12,7 @@ function notifyRelease(client: Client, message: string): void {
     });
 }
 
-async function setupReleaseNotifier(client: Client, release: Release) {
+async function setupReleaseNotifier(client: Client, release: Release): Promise<void> {
     setInterval(async () => {
         let date = new Date();
         if (
@@ -19,35 +20,46 @@ async function setupReleaseNotifier(client: Client, release: Release) {
             release.hour === date.getHours() + 1 &&
             release.minutes === date.getMinutes()
         ) {
-            await setupAllGuildsOfBot(client);
-            notifyRelease(client, release.message);
+            try {
+                await setupAllGuildsOfBot(client);
+                notifyRelease(client, release.message);
+            } catch (e) {
+                console.log(e);
+            }
         }
     }, release.checkIntervalSeconds * 1000)
-
 }
 
 async function setupAllGuildsOfBot(client: Client) {
-    client.guilds.array().forEach(setupGuild);
+    return client.guilds.array().forEach(setupGuild);
 }
 
-async function setupGuild(g: Guild): Promise<void> {
-    let chapterReadRole = await getOrCreateRole(g, 'chapter_read', RoleColors.DARK_PURPLE, true);
-    let chapterNotReadRole = await getOrCreateRole(g, 'chapter_not_read', RoleColors.BLUE, true);
-    let everyoneRole = g.defaultRole;
+async function setupGuild(g: Guild) {
+    Promise.all([
+        getOrCreateRole(g, 'chapter_read', RoleColors.DARK_PURPLE, true),
+        getOrCreateRole(g, 'chapter_not_read', RoleColors.BLUE, true),
+        getOrCreateChannelOnGuild(g, 'chapter_read', ChannelTypes.TEXT),
+        getOrCreateChannelOnGuild(g, 'chapter_not_read', ChannelTypes.TEXT),
+        getOrCreateChannelOnGuild(g, 'Textkanäle', ChannelTypes.CATEGORY)
+    ]).then(data => {
+        let chapterReadRole = data[0];
+        let chapterNotReadRole = data[1];
+        let chapterReadChannel = data[2] as TextChannel;
+        let chapterNotReadChannel = data[3] as TextChannel;
+        let parentChannel = data[4] as CategoryChannel;
 
-    let chapterReadChannel = await getOrCreateTextChannelOnGuild(g, 'chapter_read');
-    let chapterNotReadChannel = await getOrCreateTextChannelOnGuild(g, 'chapter_not_read');
-
-    await chapterReadChannel.overwritePermissions(chapterReadRole, { 'VIEW_CHANNEL': true });
-    await chapterReadChannel.overwritePermissions(everyoneRole, { 'VIEW_CHANNEL': false });
-
-    await chapterNotReadChannel.overwritePermissions(chapterNotReadRole, { 'VIEW_CHANNEL': true });
-    await chapterNotReadChannel.overwritePermissions(chapterReadRole, { 'VIEW_CHANNEL': true });
-    await chapterNotReadChannel.overwritePermissions(everyoneRole, { 'VIEW_CHANNEL': false });
-
-    g.members.forEach(async m => {
-        manageRoles(m, [chapterNotReadRole], [chapterReadRole]);
-    });
+        return Promise.all([
+            chapterReadChannel.setParent(parentChannel),
+            chapterNotReadChannel.setParent(parentChannel),
+            chapterNotReadChannel.overwritePermissions(g, { VIEW_CHANNEL: false }),
+            chapterReadChannel.overwritePermissions(chapterReadRole, { 'VIEW_CHANNEL': true }),
+            chapterNotReadChannel.overwritePermissions(chapterNotReadRole, { 'VIEW_CHANNEL': true }),
+            chapterNotReadChannel.overwritePermissions(chapterReadRole, { 'VIEW_CHANNEL': true }),
+            g.members.forEach(async m => {
+                await manageRoles(m, [chapterNotReadRole], [chapterReadRole]);
+            })
+        ])
+    })
 }
 
 async function getOrCreateRole(g: Guild, name: string, color: RoleColors, mentionable: boolean): Promise<Role> {
@@ -60,29 +72,28 @@ async function getOrCreateRole(g: Guild, name: string, color: RoleColors, mentio
     });
 }
 
-async function getOrCreateTextChannelOnGuild(g: Guild, name: string): Promise<GuildChannel> {
+async function getOrCreateChannelOnGuild(g: Guild, name: string, channelType: ChannelTypes): Promise<GuildChannel> {
     let channel: GuildChannel | undefined = g.channels.find(c => c.name === name);
     if (channel) return channel;
-    return g.createChannel(name, 'text');
+    return g.createChannel(name, channelType);
 }
 
 async function manageRoles(m: GuildMember, rolesToAdd: Role[], rolesToRemove: Role[]) {
     if (!m.user.bot) {
-        await m.addRoles(rolesToAdd);
-        await m.removeRoles(rolesToRemove);
+        return Promise.all([m.addRoles(rolesToAdd), m.removeRoles(rolesToRemove)])
     }
 }
 
 async function setRead(g: Guild, m: GuildMember) {
     let chapterReadRole = await getOrCreateRole(g, 'chapter_read', RoleColors.DARK_PURPLE, true);
     let chapterNotReadRole = await getOrCreateRole(g, 'chapter_not_read', RoleColors.BLUE, true);
-    manageRoles(m, [chapterReadRole], [chapterNotReadRole]);
+    return manageRoles(m, [chapterReadRole], [chapterNotReadRole]);
 }
 
 async function setNotRead(g: Guild, m: GuildMember) {
     let chapterReadRole = await getOrCreateRole(g, 'chapter_read', RoleColors.DARK_PURPLE, true);
     let chapterNotReadRole = await getOrCreateRole(g, 'chapter_not_read', RoleColors.BLUE, true);
-    manageRoles(m, [chapterNotReadRole], [chapterReadRole]);
+    return manageRoles(m, [chapterNotReadRole], [chapterReadRole]);
 }
 
 export { setupGuild, setupReleaseNotifier, setRead, setNotRead };

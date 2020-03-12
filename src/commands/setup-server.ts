@@ -8,7 +8,6 @@ const command: Command = {
     command: async (msg: Message, _args: string[]) => {
         await setupGuild(msg.guild);
         msg.channel.send('Setup complete.');
-
     }
 }
 
