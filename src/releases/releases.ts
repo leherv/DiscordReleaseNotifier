@@ -1,9 +1,13 @@
 import Release from "./release";
-import soloLeveling from "./solo-leveling";
-// import testRelease from "./test-release";
+import fs from "fs";
 
-const releases: Map<string, Release> = new Map<string, Release>();
-releases.set(soloLeveling.name, soloLeveling);
-// releases.set(testRelease.name, testRelease);
+function loadReleases(): Promise<Release[]> {
+    return new Promise((resolve, reject) => {
+        fs.readFile('./releases.json', 'utf8', (err, contents) => {
+            if (err) reject(err.message);
+            resolve(JSON.parse(contents));
+        });
+    })
+}
 
-export default releases;
+export default loadReleases;

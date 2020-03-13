@@ -6,7 +6,7 @@ RUN mkdir dist
 # copy src into container workdir
 COPY src ./src
 # now copy other necessary files into workdir (extra because it creates own layer and does not have to be done again if nothing changed)
-COPY tsconfig.json package*.json ./ 
+COPY tsconfig.json package*.json releases.json ./ 
 # install all dependencies
 RUN npm install
 

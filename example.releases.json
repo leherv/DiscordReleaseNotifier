@@ -1,0 +1,10 @@
+[
+    {
+        "name": "Example",
+        "message": "Example Message",
+        "day": 3,
+        "hour": 17,
+        "minutes": 0,
+        "checkIntervalSeconds": 60
+    }
+]

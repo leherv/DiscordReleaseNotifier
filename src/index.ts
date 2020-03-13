@@ -3,14 +3,20 @@ import { Client, Message } from 'discord.js';
 import config from './config';
 import commands from './commands/commands';
 import { setupReleaseNotifier } from './rolebot';
-import Releases from './releases/releases';
+import loadReleases from './releases/releases';
 
 const bot = new Client();
 
-bot.once('ready', (_: any) => {
-    console.log('Setting up releases...');
-    Releases.forEach(async r => await setupReleaseNotifier(bot, r));
-    console.log('Bot ready');
+bot.once('ready', async (_: any) => {
+    try {
+        console.log('Setting up releases...');
+        const releases = await loadReleases();
+        Promise.all(releases.map(async r => await setupReleaseNotifier(bot, r)));
+        console.log('Bot ready');
+    } catch (e) {
+        console.log('Setting up releases failed. Exiting...');
+        process.exit();
+    }
 });
 
 

@@ -18,10 +18,10 @@ function notifyRelease(client: Client, message: string): void {
 
 async function setupReleaseNotifier(client: Client, release: Release): Promise<void> {
     setInterval(async () => {
-        let date = new Date();
+        const date = new Date();
         if (
             release.day === date.getDay() &&
-            release.hour === date.getHours() + 1 &&
+            release.hour === date.getHours() &&
             release.minutes === date.getMinutes()
         ) {
             try {

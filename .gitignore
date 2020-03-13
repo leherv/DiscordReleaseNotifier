@@ -1,5 +1,7 @@
-#config file
+#example files
 src/config.ts
+releases.json
+
 
 #vscode
 .vscode/*
