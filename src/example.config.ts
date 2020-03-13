@@ -4,7 +4,7 @@ type Config = {
 };
 
 const config: Config = {
-    token: 'your token here',
+    token: 'Your Token here',
     prefix: '!'
 };
 
