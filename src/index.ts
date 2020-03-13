@@ -1,4 +1,5 @@
 import { Client, Message } from 'discord.js';
+// create a copy of example.config.ts and call it config.ts - also put your token in
 import config from './config';
 import commands from './commands/commands';
 import { setupReleaseNotifier } from './rolebot';
@@ -7,12 +8,13 @@ import Releases from './releases/releases';
 const bot = new Client();
 
 bot.once('ready', (_: any) => {
+    console.log('Setting up releases...');
+    Releases.forEach(async r => await setupReleaseNotifier(bot, r));
     console.log('Bot ready');
-    Releases.forEach(r => setupReleaseNotifier(bot, r));
 });
 
 
-bot.on('message', (msg: Message) => {
+bot.on('message', async (msg: Message) => {
     const prefix = config.prefix;
 
     if (!msg.content.startsWith(prefix) || msg.author.bot) return; // ignore all others
@@ -22,7 +24,12 @@ bot.on('message', (msg: Message) => {
 
     if (commandName) {
         if (commands.has(commandName)) {
-            commands.get(commandName)?.command(msg, args);
+            try {
+                await commands.get(commandName)?.command(msg, args);
+            } catch (e) {
+                console.log(`Executing command ${commandName} failed. \nReason:`, e);
+                msg.channel.send('Something went wrong.');
+            }
         }
     }
 });

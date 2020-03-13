@@ -6,8 +6,17 @@ const command: Command = {
     name: 'setupserver',
     description: 'Sets up roles and channels for the guild.',
     command: async (msg: Message, _args: string[]) => {
-        await setupGuild(msg.guild);
-        msg.channel.send('Setup complete.');
+        if (msg.guild) {
+            try {
+                await setupGuild(msg.guild);
+                return msg.channel.send('Setup complete.');
+            } catch (e) {
+                throw e;
+            }
+        } else {
+            console.log("Guild not set on message.");
+            throw new Error("Guild not set on message.");
+        }
     }
 }
 

@@ -10,7 +10,7 @@ const command: Command = {
         commands.forEach(command => {
             help += `!${command.name} ${command.description === '' ? '' : `- ${command.description}`}\n`
         });
-        msg.channel.send(help);
+        return msg.channel.send(help);
     }
 }
 

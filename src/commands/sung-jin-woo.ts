@@ -5,7 +5,7 @@ const command: Command = {
     name: 'sungjinwoo',
     description: '',
     command: (msg: Message, _args: string[]) => {
-        msg.channel.send('<3');
+        return msg.channel.send('<3');
     }
 }
 

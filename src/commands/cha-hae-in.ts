@@ -5,7 +5,7 @@ const command: Command = {
     name: 'chahaein',
     description: '',
     command: (msg: Message, _args: string[]) => {
-        msg.channel.send('waifu');
+        return msg.channel.send('waifu');
     }
 }
 
