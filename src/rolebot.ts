@@ -1,6 +1,7 @@
-import { Guild, Role, GuildChannel, GuildMember, TextChannel, CategoryChannel, OverwriteResolvable } from "discord.js";
+import { Guild, Role, GuildChannel, GuildMember, TextChannel, CategoryChannel, OverwriteResolvable, Client } from "discord.js";
 import RoleColors from "./role-colors";
 import ChannelTypes from "./channelTypes";
+import Release from "./releases/release";
 
 async function setupGuild(g: Guild) {
     const data = await Promise.all([
@@ -8,14 +9,21 @@ async function setupGuild(g: Guild) {
         getOrCreateRole(g, 'chapter_not_read', RoleColors.BLUE, true),
         getOrCreateChannelOnGuild(g, 'Textkanäle', ChannelTypes.CATEGORY)
     ]);
-    let chapterReadRole = data[0];
-    let chapterNotReadRole = data[1];
-    let parentChannel = (data[2] as CategoryChannel);
+    const chapterReadRole = data[0];
+    const chapterNotReadRole = data[1];
+    const parentChannel = (data[2] as CategoryChannel);
+    const botRole = getBotRole(g)?.id
+    const everyoneRole = g.roles.everyone?.id;
+    if (!botRole || !everyoneRole) throw new Error('Something went wrong...');
     return Promise.all([
         getOrCreateChannelOnGuild(g, 'chapter_read', ChannelTypes.TEXT, parentChannel, [
             {
-                id: g.id,
+                id: everyoneRole,
                 deny: "VIEW_CHANNEL"
+            },
+            {
+                id: botRole,
+                allow: "VIEW_CHANNEL"
             },
             {
                 id: chapterReadRole.id,
@@ -24,8 +32,12 @@ async function setupGuild(g: Guild) {
         ]),
         getOrCreateChannelOnGuild(g, 'chapter_not_read', ChannelTypes.TEXT, parentChannel, [
             {
-                id: g.id,
+                id: everyoneRole,
                 deny: "VIEW_CHANNEL"
+            },
+            {
+                id: botRole,
+                allow: "VIEW_CHANNEL"
             },
             {
                 id: chapterNotReadRole.id,
@@ -81,4 +93,19 @@ async function setNotRead(g: Guild, m: GuildMember) {
     return manageRoles(m, [chapterNotReadRole], [chapterReadRole]);
 }
 
-export { setupGuild, setRead, setNotRead };
+function getBotRole(g: Guild): Role | undefined {
+    return g.roles.cache.find(r => r.name === 'rolebot');
+}
+
+function sendReleaseMessage(release: Release, client: Client) {
+    return Promise.all(client.guilds.cache.map(async g => {
+        let c = g.channels.cache.find(c => c.name === 'chapter_not_read');
+        if (c !== undefined && c.type === 'text') {
+            var releaseChannel = (c as TextChannel);
+            console.log(releaseChannel);
+            await releaseChannel.send(release.message);
+        }
+    }));
+}
+
+export { setupGuild, setRead, setNotRead, sendReleaseMessage };
