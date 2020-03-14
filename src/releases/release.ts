@@ -5,8 +5,7 @@ type Release = {
     name: string,
     day: Days,
     hour: number,
-    minutes: number,
-    checkIntervalSeconds: number
+    minutes: number
 }
 
 export default Release;

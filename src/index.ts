@@ -1,20 +1,52 @@
-import { Client, Message } from 'discord.js';
+import { Client, Message, TextChannel } from 'discord.js';
 // create a copy of example.config.ts and call it config.ts - also put your token in
 import config from './config';
 import commands from './commands/commands';
-import { setupReleaseNotifier } from './rolebot';
+import { setupGuild } from './rolebot';
 import loadReleases from './releases/releases';
+import Release from './releases/release';
 
 const bot = new Client();
 
 bot.once('ready', async (_: any) => {
     try {
         console.log('Setting up releases...');
-        const releases = await loadReleases();
-        Promise.all(releases.map(async r => await setupReleaseNotifier(bot, r)));
-        console.log('Bot ready');
+        const releases: Release[] = await loadReleases();
+        setInterval(async () => {
+            try {
+                const date = new Date();
+                // identify what to release
+                const toRelease = releases.filter(release => {
+                    release.day === date.getDay() &&
+                        release.hour === date.getHours() &&
+                        release.minutes === date.getMinutes()
+                });
+
+                if (toRelease.length <= 0) return;
+
+                // setup all guilds
+                await Promise.all(bot.guilds.cache.map(g => setupGuild(g)));
+                // send each release message to each guild
+                toRelease.forEach(release => {
+                    bot.guilds.cache.forEach(async g => {
+                        let c = g.channels.cache.find(c => c.name === 'chapter_not_read');
+                        if (c !== undefined && c.type === 'text') {
+                            try {
+                                var releaseChannel = (c as TextChannel);
+                                await releaseChannel.send(release.message);
+                            } catch (e) {
+                                console.log('Could not send release-message', e);
+                            }
+                        }
+                    });
+                })
+            } catch (e) {
+                console.log('Setting up for releases failed. Exiting...', e);
+                process.exit();
+            }
+        }, 6000)
     } catch (e) {
-        console.log('Setting up releases failed. Exiting...');
+        console.log('Loading releases failed. Exiting...', e);
         process.exit();
     }
 });
