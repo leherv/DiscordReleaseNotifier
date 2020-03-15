@@ -10,4 +10,13 @@ function loadReleases(): Promise<Release[]> {
     })
 }
 
-export default loadReleases;
+function saveReleases(releases: Release[]) {
+    return new Promise((resolve, reject) => {
+        fs.writeFile('./releases.json', JSON.stringify(releases), (err) => {
+            if (err) reject(err.message);
+            resolve();
+        })
+    })
+}
+
+export { loadReleases, saveReleases };

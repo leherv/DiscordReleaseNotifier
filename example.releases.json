@@ -1,10 +1,14 @@
 [
     {
-        "name": "Example",
-        "message": "Example Message",
+        "name": "Solo Leveling Chapter",
+        "message": "ANY TIME NOW!!! GET READY FOR THE NEW CHAPTER!!!",
         "day": 3,
-        "hour": 17,
-        "minutes": 0,
-        "checkIntervalSeconds": 60
+        "hour": 16,
+        "minutes": 30,
+        "latestChapter": 109,
+        "scrapeTask": {
+            "url": "https://jaiminisbox.com/reader/series/solo-leveling",
+            "message": "HERE IS WHAT YOU ALL WAITED FOR: "
+        }
     }
 ]

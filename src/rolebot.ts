@@ -1,7 +1,6 @@
 import { Guild, Role, GuildChannel, GuildMember, TextChannel, CategoryChannel, OverwriteResolvable, Client } from "discord.js";
 import RoleColors from "./role-colors";
 import ChannelTypes from "./channelTypes";
-import Release from "./releases/release";
 
 async function setupGuild(g: Guild) {
     const data = await Promise.all([
@@ -97,15 +96,16 @@ function getBotRole(g: Guild): Role | undefined {
     return g.roles.cache.find(r => r.name === 'rolebot');
 }
 
-function sendReleaseMessage(release: Release, client: Client) {
+function sendMessage(message: string, client: Client) {
     return Promise.all(client.guilds.cache.map(async g => {
         let c = g.channels.cache.find(c => c.name === 'chapter_not_read');
         if (c !== undefined && c.type === 'text') {
             var releaseChannel = (c as TextChannel);
             console.log(releaseChannel);
-            await releaseChannel.send(release.message);
+            await releaseChannel.send(message);
         }
     }));
 }
 
-export { setupGuild, setRead, setNotRead, sendReleaseMessage };
+
+export { setupGuild, setRead, setNotRead, sendMessage };
