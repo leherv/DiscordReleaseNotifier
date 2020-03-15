@@ -93,7 +93,7 @@ async function setNotRead(g: Guild, m: GuildMember) {
 }
 
 function getBotRole(g: Guild): Role | undefined {
-    return g.roles.cache.find(r => r.name === 'rolebot');
+    return g.roles.cache.find(r => r.name === 'SL-Bot');
 }
 
 function sendMessage(message: string, client: Client) {
