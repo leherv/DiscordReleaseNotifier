@@ -15,7 +15,10 @@ async function fetchScrapingResult(url: string): Promise<ScrapingResult> {
 
 async function fetchSLScrapingResult(): Promise<ScrapingResult> {
     try {
-        const browser = await puppeteer.launch({ headless: true });
+        const browser = await puppeteer.launch({
+            executablePath: '/usr/bin/chromium-browser',
+            args: ['--no-sandbox']
+        });
         const page = await browser.newPage();
         await page.goto('https://jaiminisbox.com/reader/series/solo-leveling');
         await page.waitForSelector('div.group', { timeout: 5000 });

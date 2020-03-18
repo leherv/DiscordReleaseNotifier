@@ -47,7 +47,6 @@ bot.once('ready', async (_: any) => {
                             if (scrapeResult.chapter > release.latestChapter) {
                                 release.latestChapter++;
                                 saveNeeded = true;
-                                console.log("inside minutespassed: saveNeeded: ", saveNeeded);
                                 await Promise.all(bot.guilds.cache.map(g => setupGuild(g)));
                                 await sendMessage(release.scrapeTask.message + scrapeResult.href, bot);
                             }

@@ -101,7 +101,6 @@ function sendMessage(message: string, client: Client) {
         let c = g.channels.cache.find(c => c.name === 'chapter_not_read');
         if (c !== undefined && c.type === 'text') {
             var releaseChannel = (c as TextChannel);
-            console.log(releaseChannel);
             await releaseChannel.send(message);
         }
     }));
