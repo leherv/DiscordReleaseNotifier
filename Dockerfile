@@ -12,6 +12,9 @@ RUN apk add --no-cache \
     nodejs \
     npm
 
+# Tell Puppeteer to skip installing Chrome. We'll be using the installed package.
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
+
 # set workdir inside container
 WORKDIR /usr/src/app
 # create dist directory
