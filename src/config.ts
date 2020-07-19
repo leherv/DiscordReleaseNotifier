@@ -4,7 +4,7 @@ type Config = {
 };
 
 const config: Config = {
-    token: 'Your Token here',
+    token: process.env['BOT_TOKEN'] ?? '',
     prefix: '!'
 };
 
