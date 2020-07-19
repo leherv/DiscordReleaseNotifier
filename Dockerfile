@@ -71,7 +71,7 @@ RUN mkdir dist
 # copy src into container workdir
 COPY --chown=pwuser:pwuser src ./src
 # now copy other necessary files into workdir (extra because it creates own layer and does not have to be done again if nothing changed)
-COPY --chown=pwuser:pwuser tsconfig.json package*.json releaseScrapingTasks.json ./ 
+COPY --chown=pwuser:pwuser tsconfig.json package*.json releaseScrapingTasks.json .env ./ 
 # install all dependencies
 RUN npm install
 
