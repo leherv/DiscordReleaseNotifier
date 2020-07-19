@@ -1,10 +1,6 @@
 [
     {
-        "name": "Solo Leveling Chapter",
-        "message": "ANY TIME NOW!!! GET READY FOR THE NEW CHAPTER!!!",
-        "day": 3,
-        "hour": 16,
-        "minutes": 30,
+        "name": "Solo Leveling",
         "latestChapter": 109,
         "scrapeTask": {
             "url": "https://jaiminisbox.com/reader/series/solo-leveling",

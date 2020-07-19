@@ -5,3 +5,5 @@ services:
     build: .
     container_name: discord_release_notifier
     image: discord_release_notifier
+    environment:
+      BOT_TOKEN: ${BOT_TOKEN} 
